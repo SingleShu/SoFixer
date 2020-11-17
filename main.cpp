@@ -2,18 +2,10 @@
 #include "ElfReader.h"
 #include "ElfRebuilder.h"
 #include "FDebug.h"
-#include <getopt.h>
 
 
 const char* short_options = "hdm:s:o:";
-const struct option long_options[] = {
-        {"help", 0, NULL, 'h'},
-        {"debug", 0, NULL, 'd'},
-        {"memso", 1, NULL, 'm'},
-        {"source", 1, NULL, 's'},
-        {"output", 1, NULL, 'o'},
-        {nullptr, 0, nullptr, 0}
-};
+
 void useage();
 
 int main(int argc, char* argv[]) {
@@ -23,45 +15,30 @@ int main(int argc, char* argv[]) {
 
     std::string source, output;
     bool isValidArg = true;
-    while((c = getopt_long(argc, argv, short_options, long_options, nullptr)) != -1) {
-        switch (c) {
-            case 'd':
-                printf("Use debug mode\n");
-                break;
-            case 's':
-                source = optarg;
-                break;
-            case 'o':
-                output = optarg;
-                break;
-            case 'm': {
-                auto is16Bit = [](const char* c) {
-                    auto len = strlen(c);
-                    if(len > 2) {
-                        if(c[0] == '0' & c[1] == 'x') return true;
-                    }
-                    bool is10bit = true;
-                    for(auto i = 0; i < len; i++) {
-                        if((c[i] > 'a' && c[i] < 'f') ||
-                           (c[i] > 'A' && c[i] < 'F')) {
-                            is10bit = false;
-                        }
-                    }
-                    return !is10bit;
-                };
-#ifndef __SO64__
-                auto base = strtoul(optarg, 0, is16Bit(optarg) ? 16: 10);
-#else
-                auto base = strtoull(optarg, 0, is16Bit(optarg) ? 16: 10);
-#endif
-                elf_reader.setDumpSoFile(true);
-                elf_reader.setDumpSoBaseAddr(base);
-            }
-                break;
-            default:
-                isValidArg = false;
-                break;
-        }
+    printf("/*********************************************sofixer***************************************/\n");
+    printf("args counts : %d\n",argc);
+    for (size_t i = 1; i < argc; )
+    {
+      char* argStr = argv[i];
+      if (strcmp(argStr,"-s") == 0) {
+        source = argv[i + 1];
+        printf("[main::argcv ]source : %s\n",source.c_str());
+        i += 2;
+        continue;
+      } else if (strcmp(argStr, "-o") == 0) {
+        output = argv[i + 1];
+        printf("[main::argcv ]output : %s\n", output.c_str());
+        i += 2;
+        continue;
+      } else if (strcmp(argStr, "-m") == 0) {
+        auto base = strtoul(argv[i + 1],0,16);
+        printf("[main::argcv ]base : 0x%02X\n", base);
+        elf_reader.setDumpSoFile(true);
+        elf_reader.setDumpSoBaseAddr(base);
+        i += 2;
+        continue;
+      }
+      i++;
     }
     if(!isValidArg) {
         useage();
