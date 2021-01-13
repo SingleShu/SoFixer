@@ -6,6 +6,7 @@ so修复相关，so结构研究得不多，勉强够我自己用而已。
 原理参考下面的文章
 TK so修复参考[http://bbs.pediy.com/thread-191649.htm]
 
+测试用例：Sofixer.exe -s .\libandroidmainruns.so_0xda658000_0x9f000.so -o fix.so -d -m -dumpbase 0x658000
 
 编译过程：
 1、windows，visual studio 2019
