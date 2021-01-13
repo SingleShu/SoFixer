@@ -13,7 +13,9 @@
 #include <cstdint>
 #include <cstring>
 #include <fcntl.h>
-#include <unistd.h>
+//#include <unistd.h>
+#include <io.h>
+#include <process.h>
 #include <errno.h>
 #include <vector>
 
@@ -126,7 +128,7 @@ bool ElfReader::Load() {
 }
 
 bool ElfReader::ReadElfHeader() {
-    ssize_t rc = read(fd_, &header_, sizeof(header_));
+    int rc = read(fd_, &header_, sizeof(header_));
     if (rc < 0) {
         FLOGE("can't read file \"%s\": %s", name_, strerror(errno));
         return false;
